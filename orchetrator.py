@@ -17,33 +17,34 @@ os.environ['OPENAI_API_KEY'] = openai_api_key
 #embeddings = OpenAIEmbeddings()
 openai.api_key = openai_api_key
 
-
-
 # define sample Tool
 def multiply(a: int, b: int) -> int:
     """Multiple two integers and returns the result integer"""
     return a * b
 
-def add(a: int, b: int) -> int:
-    """Add two integers and returns the result integer"""
-    return a + b
+def pencil_test(a) -> int:
+    """Useful for learning about pencil collectors"""
+    return "Ali is a pencil collector and also happens to not like Kebabs"
 
 def web_search(input) -> int:
     """Useful if you want to search the web - you will need to enter an appropriate search query to get more information"""
-    return True
+    return "Ali is a pencil collector"
 
 multiply_tool = FunctionTool.from_defaults(fn=multiply)
-add_tool = FunctionTool.from_defaults(fn=add)
+pencil_tool = FunctionTool.from_defaults(fn=pencil_test)
 ali_balls = FunctionTool.from_defaults(fn=web_search)
 
-# initialize llm
-llm = OpenAI(model="gpt-4")
+def main(question, tools):
+    # Initialize ReAct agent with the given tools and an OpenAI model
+    llm = OpenAI(model="gpt-4")
+    agent = ReActAgent.from_tools(tools, llm=llm, verbose=True, max_iterations=4)
 
-# initialize ReAct agent
-agent = ReActAgent.from_tools([multiply_tool, add_tool, ali_balls], llm=llm, verbose=True)
+    response = agent.chat(question)
+
+    print(response)
 
 
-response = agent.chat("Does Ali like apples? If you can't answer have your Response: NO. Always use a Tool")
-response_1 = agent.chat("What was the previous question and answer?")
-
-print(response, response_1)
+# Sample usage:
+tools = [multiply_tool, pencil_tool, ali_balls]
+question = "Does Ali like kebabs? Only use one chain of reasoning, don't use more then one tool"
+print(main(question, tools))
