@@ -19,7 +19,7 @@ embed_model = OpenAIEmbedding()
 load_dotenv()
 
 cohere_api_key = os.environ.get("COHERE_API_KEY")
-openai_api_key = os.environ.get("OPENAI_API")
+openai_api_key = os.environ.get("OPENAI_API_KEY")
 activeloop_key = os.environ.get("ACTIVELOOP_TOKEN")
 
 os.environ["OPENAI_API"] = openai_api_key
@@ -36,10 +36,10 @@ service_context = ServiceContext.from_defaults(embed_model=embed_model)
 documents = ingest_main(["https://docs.solana.com/"])
 
 # Below is for code repos
-#documents = retrieve_repo_docs("bal_repos")
+# documents = retrieve_repo_docs("bal_repos")
 
 # Below is for Custom Docs
-#documents = create_documents_from_csv('tali-updated-5/balancer_custom_ingestion.csv')
+# documents = create_documents_from_csv('tali-updated-5/balancer_custom_ingestion.csv')
 print("docs length", len(documents))
 dataset_path = "hub://tali/test-123"
 
