@@ -20,7 +20,7 @@ load_dotenv()
 
 cohere_api_key = os.environ.get("COHERE_API_KEY")
 openai_api_key = os.environ.get("OPENAI_API")
-activeloop_key = openai_api_key = os.environ.get("ACTIVELOOP_TOKEN")
+activeloop_key = os.environ.get("ACTIVELOOP_TOKEN")
 
 os.environ["OPENAI_API"] = openai_api_key
 os.environ[
@@ -47,8 +47,3 @@ dataset_path = "hub://tali/test-123"
 vector_store = DeepLakeVectorStore(dataset_path=dataset_path, overwrite=True)
 storage_context = StorageContext.from_defaults(vector_store=vector_store)
 index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, service_context=service_context)
-
-index = VectorStoreIndex.from_documents(documents)
-query_engine = index.as_query_engine()
-response = query_engine.query("What is the document about?")
-print(textwrap.fill(str(response), 100))
