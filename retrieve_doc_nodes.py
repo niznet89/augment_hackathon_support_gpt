@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 from typing import Tuple, Dict, Any
-from langchain.text_splitter import CharacterTextSplitter
 from llama_index import Document
 
 
@@ -9,7 +8,6 @@ def page_ingest(url) -> Tuple[str, Dict[str, Any]]:
 
     print("url", url)
     label = ''
-
 
     # Fetch the content from url
     response = requests.get(url)
@@ -30,7 +28,8 @@ def page_ingest(url) -> Tuple[str, Dict[str, Any]]:
 
     document = Document(text=text, extra_info={'source': url})
     print(document)
-    return  document
+    return document
+
 
 def ingest_main(list_urls):
     list_of_docs = []
@@ -38,5 +37,6 @@ def ingest_main(list_urls):
         page = page_ingest(url)
         list_of_docs.append(page)
     return list_of_docs
+
 
 __all__ = ['ingest_main']
