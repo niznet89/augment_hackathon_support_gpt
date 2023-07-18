@@ -1,0 +1,28 @@
+# Considerations
+- Each Tool is modular
+- Tools: Company data sources, Web Search, Discord search
+
+# Tools
+Query Data Sources: query company data sources such as Docs
+Query Web Search: LLM makes a search to Google, Bing, etc.
+Query Discord: Search through Discord messages and channels for Tribal Knowledge
+
+# Docs ingestion
+1. Sitemap -> Get all URLs from sitemap
+2. Fetch URL -> Get HTML content of URL
+3. Create a Deeplake dataset for querying
+
+
+# First query
+1. Query comes in
+2. Query is sanitized for PII data?
+3. Query hits Query Data Sources Tool
+4. Answer is generated w/ 3.5-turbo
+5. Answer + sources are passed to gpt-4; does this answer the query?
+6. If YES, return answer and sources
+7. If NO, initiate Agent workflow
+
+# Agent + Orchestrator workflow
+1. The response is provided + a reason from gpt-4 why it didn't pass it
+2. This is passed to an Orchestrator who is prompted with it's task + Tools it has available
+3.
