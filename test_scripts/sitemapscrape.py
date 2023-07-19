@@ -6,14 +6,7 @@ from langchain.document_loaders import WebBaseLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import DeepLake
 from langchain.embeddings.openai import OpenAIEmbeddings
-activeloop_token = "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY4MzU3MTMxNiwiZXhwIjoxNjk0Mjg0ODU5fQ.eyJpZCI6ImFsaWthZ2hhIn0.t1S4NPwPFbDDyDa6uMzrGdud1hUTYMzWXp6Ao7QX9NLZ_sdIH0IiHWWpDz141H9IYz7pWUKzqZjTlQ9j4X_wNg"
-os.environ[
-    "ACTIVELOOP_TOKEN"
-] = "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY4MzU3MTMxNiwiZXhwIjoxNjk0Mjg0ODU5fQ.eyJpZCI6ImFsaWthZ2hhIn0.t1S4NPwPFbDDyDa6uMzrGdud1hUTYMzWXp6Ao7QX9NLZ_sdIH0IiHWWpDz141H9IYz7pWUKzqZjTlQ9j4X_wNg"
-# Check for valid API key
-openai_api_key = "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"
-if not openai_api_key:
-    raise ValueError("OPENAI_API_KEY not found in environment variables")
+
 
 openai.api_key = openai_api_key
 os.environ["OPENAI_API_KEY"] = openai_api_key
