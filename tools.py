@@ -44,7 +44,7 @@ def search_discord(query):
     query_vector = [random.random() for _ in range(1536)]
     documents = reader.load_data(
         query_vector=query_vector,
-        dataset_path="hub://tali/test-123",
+        dataset_path="hub://tali/ocean_protocol_docs",
         limit=30,
     )
     documents = documents

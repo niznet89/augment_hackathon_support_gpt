@@ -52,5 +52,5 @@ question = """You are an expert technical support agent. You have a set of tools
 
             You'll have 5 iterations to ask questions to the different data sources.
 
-            QUESTION: Will the Balancer deployment on Base have Weighted Pools that are integrated into the veBAL system right away?"""
+            QUESTION: n ocean.js when calling the function nft.setMetadataAndTokenURI() you need to set additional tokenId and tokenUri parameters compared to nft.setMetadata(). If I figured out correctly you put 1 as the value for tokenId but wherefrom do you derive the string (required?) for tokenURI?"""
 print(main(question, tools))

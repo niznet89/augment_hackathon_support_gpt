@@ -14,8 +14,6 @@ from llama_index.embeddings import OpenAIEmbedding
 
 embed_model = OpenAIEmbedding()
 
-# load in HF embedding model from langchain
-
 load_dotenv()
 
 cohere_api_key = os.environ.get("COHERE_API_KEY")
