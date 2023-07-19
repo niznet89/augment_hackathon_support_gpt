@@ -21,6 +21,9 @@ activeloop_key = os.environ.get("ACTIVELOOP_TOKEN")
 scraping_dog_key = os.environ.get("SCRAPING_DOG_KEY")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 SEARCH_ENGINE_ID = os.environ.get("SEARCH_ENGINE_ID")
+zendesk_api = os.environ.get("ZENDESK_API")
+zendesk_email = os.environ.get("ZENDESK_EMAIL")
+
 
 co = cohere.Client(cohere_api_key)
 
@@ -44,7 +47,7 @@ def search_discord(query):
     query_vector = [random.random() for _ in range(1536)]
     documents = reader.load_data(
         query_vector=query_vector,
-        dataset_path="hub://tali/test-123",
+        dataset_path="hub://tali/ocean_protocol_discord",
         limit=30,
     )
     documents = documents
@@ -143,12 +146,52 @@ def google_search(query):
                     messages=[chat_message],
                     temperature=0
                 )
-        completion_string =completion.choices[0].message['content']
+        completion_string = completion.choices[0].message['content']
         print(completion_string)
         document = Document(text=completion_string, extra_info={'source': url})
         document_array.append(document)
     print(document_array)
     return document_array
+
+def ticket_escalation(email, query):
+    """Use this Tool (ticket escalation) if you cannont answer the question. Do not continue with any further iterations. If this tool is used, end with: 'Query Escalated'"""
+
+
+    prompt = f"You are an expert at writing ticket Subject lines. Based on the question, write a brief 1 line summary that fits in a subject line. {query}"
+    chat_message= {"role": "user", "content": prompt}
+    completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[chat_message],
+                temperature=0
+            )
+
+    completion_string = completion.choices[0].message['content']
+    # New ticket info
+    subject = f'AI BOT ESCALATION: {completion_string}'
+    body = f"USER EMAIL: {email}\n\n" + query
+
+    # Package the data in a dictionary matching the expected JSON
+    data = {'ticket': {'subject': subject, 'comment': {'body': body}}}
+
+    # Encode the data to create a JSON payload
+    payload = json.dumps(data)
+
+    # Set the request parameters
+    url = 'https://taliaihelp.zendesk.com/api/v2/tickets.json'
+    user = zendesk_email
+    pwd = zendesk_api
+    headers = {'content-type': 'application/json'}
+
+    # Do the HTTP post request
+    response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
+
+    # Check for HTTP codes other than 201 (Created)
+    if response.status_code != 201:
+        print('Status:', response, 'Problem with the request. Exiting.')
+        exit()
+
+    # Report success
+    print('Successfully created the ticket.')
 
 def cut_string_at_char(input_string, max_tokens=14000):
     length = len(input_string)
@@ -159,4 +202,4 @@ def cut_string_at_char(input_string, max_tokens=14000):
     else:
         return input_string
 
-__all__ = ['search_discord', 'google_search']
+__all__ = ['search_discord', 'google_search', 'ticket_escalation']

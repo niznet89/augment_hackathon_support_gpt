@@ -15,8 +15,8 @@ from llama_index.llms import OpenAI
 import random
 import openai
 from llama_index.indices.postprocessor.cohere_rerank import CohereRerank
-from tools import search_discord, google_search
 import json
+from tools import search_discord, google_search, ticket_escalation
 load_dotenv()
 openai_embeddings = OpenAIEmbeddings()
 
@@ -103,14 +103,15 @@ def email_received():
         return "Kabobs"
 
     discord = FunctionTool.from_defaults(fn=search_discord)
-    # google = FunctionTool.from_defaults(fn=google_search)
+    google = FunctionTool.from_defaults(fn=google_search)
+    ticket = FunctionTool.from_defaults(fn=ticket_escalation)
 
     # initialize llm
     llm = OpenAI(model="gpt-3.5-turbo-0613")
 
     # initialize ReAct agent
     agent = ReActAgent.from_tools(
-        [discord], llm=llm, verbose=True)
+        [discord, google, ticket], llm=llm, verbose=True, max_iterations=3)
 
     #### Evaluate if the question is answered by the inital docs search#####
 
@@ -215,11 +216,13 @@ def email_received():
         return 'Success', 200
 
     else:
-        agent.chat(f"""Use the following tools to answer this question: 
-                
+        agent.chat(f"""Use the following tools to answer this question:
+
             Query:{query}
 
-            You can only use tools to answer the question. You can only use one tool. Do not answer with anything outside of information from the tools.""")
+            You can only use tools to answer the question. You can only use one tool. Do not answer with anything outside of information from the tools.
+
+            You'll have 3 iterations to ask questions of the different tools. If you're on the 3rd iteration and you don't have an answer USE the Ticket Escalation tool.""")
         print("Agent Chat History: ", agent.chat_history)
 
         data = {
@@ -235,6 +238,7 @@ def email_received():
             print('POST was successful')
         else:
             print('Failed to send POST')
+
     return 'Success', 200
 
 
