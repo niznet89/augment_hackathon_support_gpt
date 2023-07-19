@@ -202,4 +202,4 @@ def cut_string_at_char(input_string, max_tokens=14000):
     else:
         return input_string
 
-__all__ = ['search_discord', 'google_search', 'ticket_escalation']
+__all__ = ['search_discord', 'google_search', 'ticket_escalation', 'ticket_solved']

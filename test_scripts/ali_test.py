@@ -16,7 +16,7 @@ import random
 import openai
 from llama_index.indices.postprocessor.cohere_rerank import CohereRerank
 import json
-from tools import search_discord, google_search, ticket_escalation
+from tools import search_discord, google_search, ticket_escalation, ticket_solved
 load_dotenv()
 openai_embeddings = OpenAIEmbeddings()
 
@@ -44,7 +44,7 @@ documents = reader.load_data(
 documents = documents
 
 
-@app.route('/email_received', methods=['POST'])
+# @app.route('/email_received', methods=['POST'])
 def email_received():
     global documents
 
@@ -102,7 +102,6 @@ def email_received():
         print("ali_food hit")
         return "Kabobs"
 
-    discord = FunctionTool.from_defaults(fn=search_discord)
     google = FunctionTool.from_defaults(fn=google_search)
     ticket = FunctionTool.from_defaults(fn=ticket_escalation)
 
@@ -111,7 +110,7 @@ def email_received():
 
     # initialize ReAct agent
     agent = ReActAgent.from_tools(
-        [discord, google, ticket], llm=llm, verbose=True, max_iterations=3)
+        [google, ticket], llm=llm, verbose=True, max_iterations=2)
 
     #### Evaluate if the question is answered by the inital docs search#####
 
@@ -199,21 +198,21 @@ def email_received():
     if evaluationResults == "Yes":
         print("Evaluation Results: ", evaluationResults)
 
-        data = {
-            "who": "Ali@trytali.com",  # Replace with the actual data
-            "what": {initalAnswer},  # Replace with the actual data
-        }
+        # data = {
+        #     "who": "Ali@trytali.com",  # Replace with the actual data
+        #     "what": {initalAnswer},  # Replace with the actual data
+        # }
 
-        # Send the POST request
-        response = requests.post(url, json=data)
+        # # Send the POST request
+        # response = requests.post(url, data=data)
 
-        # Check the response
-        if response.status_code == 200:
-            print('POST was successful')
-        else:
-            print('Failed to send POST')
+        # # Check the response
+        # if response.status_code == 200:
+        #     print('POST was successful')
+        # else:
+        #     print('Failed to send POST')
 
-        return 'Success', 200
+        # return 'Success', 200
 
     else:
         agent.chat(f"""Use the following tools to answer this question:
@@ -222,22 +221,22 @@ def email_received():
 
             You can only use tools to answer the question. You can only use one tool. Do not answer with anything outside of information from the tools.
 
-            You'll have 3 iterations to ask questions of the different tools. If you're on the 3rd iteration and you don't have an answer USE the Ticket Escalation tool.""")
+            You'll have 2 iterations to ask questions of the different tools. If you're on the 2nd iteration and you don't have an answer USE the Ticket Escalation tool.""")
         print("Agent Chat History: ", agent.chat_history)
 
-        data = {
-            "who": "Ali@trytali.com",  # Replace with the actual data
-            "what": {agent.chat_history},  # Replace with the actual data
-        }
+        # data = {
+        #     "who": "Ali@trytali.com",  # Replace with the actual data
+        #     "what": {agent.chat_history},  # Replace with the actual data
+        # }
 
-        # Send the POST request
-        response = requests.post(url, json=data)
+        # # Send the POST request
+        # response = requests.post(url, data=data)
 
-        # Check the response
-        if response.status_code == 200:
-            print('POST was successful')
-        else:
-            print('Failed to send POST')
+        # # Check the response
+        # if response.status_code == 200:
+        #     print('POST was successful')
+        # else:
+        #     print('Failed to send POST')
 
     return 'Success', 200
 
