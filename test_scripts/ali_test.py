@@ -14,7 +14,7 @@ from llama_index.llms import OpenAI
 import random
 import openai
 from llama_index.indices.postprocessor.cohere_rerank import CohereRerank
-from tools import search_discord, google_search
+from tools import search_discord, google_search, ticket_escalation
 load_dotenv()
 openai_embeddings = OpenAIEmbeddings()
 
@@ -31,7 +31,7 @@ co = cohere.Client(cohere_api_key)
 #### DeepLake####
 # This function retrieves the DeepLake datasets
 
-query = "On Ocean Protocol,  right now im trying to build up my own market-place with an external chain (Gen-X-Testnet). In the current state, i can see all service offerings, which are cached by aquarius. there are some difficulties though with publishing a dataset towards the Gen-X-Testnet from our marketplace. I can verify with Block Explorer, that the transactions worked successfully. But theres an issue with publishing the ddo."
+query = "Please help, things are broken and I need human support."
 
 query_vector = [random.random() for _ in range(1536)]
 reader = DeepLakeReader()
@@ -83,14 +83,15 @@ def ali_food() -> int:
 
 
 discord = FunctionTool.from_defaults(fn=search_discord)
-# google = FunctionTool.from_defaults(fn=google_search)
+google = FunctionTool.from_defaults(fn=google_search)
+ticket = FunctionTool.from_defaults(fn=ticket_escalation)
 
 # initialize llm
-llm = OpenAI(model="gpt-3.5-turbo-0613")
+llm = OpenAI(model="gpt-4")
 
 # initialize ReAct agent
 agent = ReActAgent.from_tools(
-    [discord], llm=llm, verbose=True)
+    [discord, google, ticket], llm=llm, verbose=True, max_iterations=3)
 
 #### Evaluate if the question is answered by the inital docs search#####
 
@@ -135,22 +136,24 @@ for _ in range(MAX_RETRIES):
 prompt2 = f"""
     You are Tali, a developer support bot. Your role is to assist with project development and problem-solving. A user has asked a query, and an answer has been created based on synthesising multiple data sources.
 
-    Your job is to evaluate if the provided answer satisfies the question just based on the context provided. 
-    
+    Your job is to evaluate if the provided answer satisfies the question just based on the context provided.
+
     You MUST follow these principles:
-    
-    1) If the query is not being answered by the context respond with "No" 
+
+    1) If the query is not being answered by the context respond with "No"
     2) If the query is being answered sufficiently based on the context respond with "Yes"
     3) If you are not at least 80% sure that the answer is correct respond with "No"
     4) If you are at least 80% sure that the answer is correct respond with "Yes"
     5) If the answer says "I don't know", respond with "No"
-    
+    6) If they need human support ONLY respond with "No".
+
     query: {query}
 
     answer: {initalAnswer}
 
     context: {documents_content}
 
+    Remember, if they ask for human support respond with "No".
     Remember, you can only use the context provided to answer the question. You can only reply with a "Yes" or "No"."""
 
 MAX_RETRIES = 3
@@ -170,6 +173,7 @@ for _ in range(MAX_RETRIES):
         # return the cleaned text from the model
         print('completion', completion['choices'][0]['message']['content'])
         evaluationResults = completion['choices'][0]['message']['content']
+        break
     except Exception as e:
         print(f"Error calling OpenAI API: {e}")
 
@@ -180,9 +184,11 @@ print("evaluationResults", evaluationResults)
 if evaluationResults == "Yes":
     print("Evaluation Results: ", evaluationResults)
 else:
-    agent.chat(f"""Use the following tools to answer this question: 
-               
+    agent.chat(f"""Use the following tools to answer this question:
+
         Query:{query}
 
-        You can only use tools to answer the question. You can only use one tool. Do not answer with anything outside of information from the tools.""")
+        You can only use tools to answer the question. You can only use one tool. Do not answer with anything outside of information from the tools.
+
+        You'll have 3 iterations to ask questions of the different tools. If you're on the 3rd iteration and you don't have an answer USE the Ticket Escalation tool.""")
     print("Agent Chat History: ", agent.chat_history)

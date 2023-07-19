@@ -24,7 +24,7 @@ SEARCH_ENGINE_ID = os.environ.get("SEARCH_ENGINE_ID")
 zendesk_api = os.environ.get("ZENDESK_API")
 zendesk_email = os.environ.get("ZENDESK_EMAIL")
 
-print(cohere_api_key)
+
 co = cohere.Client(cohere_api_key)
 
 
@@ -47,7 +47,7 @@ def search_discord(query):
     query_vector = [random.random() for _ in range(1536)]
     documents = reader.load_data(
         query_vector=query_vector,
-        dataset_path="hub://tali/ocean_protocol_docs",
+        dataset_path="hub://tali/ocean_protocol_discord",
         limit=30,
     )
     documents = documents
@@ -154,7 +154,7 @@ def google_search(query):
     return document_array
 
 def ticket_escalation(email, query):
-    """Use this Tool if you cannont answer the question. Do not continue with any further iterations. If this tool is used, end with: 'Query Escalated'"""
+    """Use this Tool (ticket escalation) if you cannont answer the question. Do not continue with any further iterations. If this tool is used, end with: 'Query Escalated'"""
 
 
     prompt = f"You are an expert at writing ticket Subject lines. Based on the question, write a brief 1 line summary that fits in a subject line. {query}"

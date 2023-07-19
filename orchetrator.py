@@ -12,7 +12,6 @@ load_dotenv()
 cohere_api_key = os.environ.get("COHERE_API_KEY")
 openai_api_key = os.environ.get("OPENAI_API")
 
-print(cohere_api_key)
 
 os.environ['OPENAI_API_KEY'] = openai_api_key
 #os.environ['ACTIVELOOP_TOKEN'] = activeloop_token
@@ -50,10 +49,10 @@ def main(question, tools):
 
 
 # Sample usage:
-tools = [ticket_tool, search_tool]
+tools = [ticket_tool, search_tool, discord_tool]
 question = """You are an expert technical support agent. You have a set of tools available to be able to answer the users query. Based on previous answers, change the queries you're asking to get more useful information.
 
-            You'll have 5 iterations to ask questions to the different data sources.
+            You'll have 3 iterations to ask questions to the different data sources. If you're on the 3rd iteration and you don't have an answer USE the Ticket Escalation tool.
 
-            QUESTION: n ocean.js when calling the function nft.setMetadataAndTokenURI() you need to set additional tokenId and tokenUri parameters compared to nft.setMetadata(). If I figured out correctly you put 1 as the value for tokenId but wherefrom do you derive the string (required?) for tokenURI?"""
+            QUESTION:  Hi, I'm trying to implement startOrder(...) method in Swift using library https://github.com/argentlabs/web3.swift#smart-contracts-static-types and I wonder how could the method parameters  (consumer, serviceIndex, providerFee, consumeMarketFee) be inserted into the transaction data structure used in the library interface?"""
 print(main(question, tools))
