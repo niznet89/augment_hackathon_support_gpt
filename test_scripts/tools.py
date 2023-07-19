@@ -193,6 +193,46 @@ def ticket_escalation(email, query):
     # Report success
     print('Successfully created the ticket.')
 
+def ticket_solved(email, query):
+    """Use this Tool (Ticket Solved) if you CAN answer the question. Do not continue with any further iterations. If this tool is used, end with: 'Query Escalated'"""
+
+
+    prompt = f"You are an expert at writing ticket Subject lines. Based on the question, write a brief 1 line summary that fits in a subject line. {query}"
+    chat_message= {"role": "user", "content": prompt}
+    completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[chat_message],
+                temperature=0
+            )
+
+    completion_string = completion.choices[0].message['content']
+    # New ticket info
+    subject = f'TICKET SOLVED: {completion_string}'
+    body = f"USER EMAIL: {email}\n\n" + query
+
+    # Package the data in a dictionary matching the expected JSON
+    data = {'ticket': {'subject': subject, 'comment': {'body': body}}}
+
+    # Encode the data to create a JSON payload
+    payload = json.dumps(data)
+
+    # Set the request parameters
+    url = 'https://taliaihelp.zendesk.com/api/v2/tickets.json'
+    user = zendesk_email
+    pwd = zendesk_api
+    headers = {'content-type': 'application/json'}
+
+    # Do the HTTP post request
+    response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
+
+    # Check for HTTP codes other than 201 (Created)
+    if response.status_code != 201:
+        print('Status:', response, 'Problem with the request. Exiting.')
+        exit()
+
+    # Report success
+    print('Successfully created the ticket.')
+
 def cut_string_at_char(input_string, max_tokens=14000):
     length = len(input_string)
 
@@ -202,4 +242,4 @@ def cut_string_at_char(input_string, max_tokens=14000):
     else:
         return input_string
 
-__all__ = ['search_discord', 'google_search', 'ticket_escalation']
+__all__ = ['search_discord', 'google_search', 'ticket_escalation', "ticket_solved"]
