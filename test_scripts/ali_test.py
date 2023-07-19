@@ -31,7 +31,7 @@ co = cohere.Client(cohere_api_key)
 #### DeepLake####
 # This function retrieves the DeepLake datasets
 
-query = "Please help, things are broken and I need human support."
+query = "Implementing startOrder Method with Parameters in Swift Using Web3.swift Library"
 
 query_vector = [random.random() for _ in range(1536)]
 reader = DeepLakeReader()
