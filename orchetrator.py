@@ -4,7 +4,7 @@ from llama_index.agent import ReActAgent
 from dotenv import load_dotenv
 import os
 import openai
-from tools import search_discord, google_search
+from test_scripts.tools import search_discord, google_search
 
 load_dotenv()
 

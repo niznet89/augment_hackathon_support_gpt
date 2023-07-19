@@ -14,7 +14,7 @@ from llama_index.llms import OpenAI
 import random
 import openai
 from llama_index.indices.postprocessor.cohere_rerank import CohereRerank
-
+from tools import search_discord, google_search
 load_dotenv()
 openai_embeddings = OpenAIEmbeddings()
 
@@ -31,35 +31,14 @@ co = cohere.Client(cohere_api_key)
 #### DeepLake####
 # This function retrieves the DeepLake datasets
 
-
-# def retrieve_datasets_deeplake(list_of_dl_datasets):
-#     print("retrieve_datasets_deeplake hit")
-#     dl_dict = {}  # Define an empty dictionary to store the retrieved datasets
-#     for dataset in list_of_dl_datasets:  # Loop through the list of dataset names provided
-#         try:
-#             # Create a DeepLake object for each dataset and add it to the dictionary
-#             db = DeepLake(
-#                 dataset_path=f"hub://tali/{dataset}", read_only=True, embedding_function=openai_embeddings)
-#             # Map dataset name to the corresponding DeepLake object
-#             dl_dict[dataset] = db
-#         except AssertionError:  # Catch any AssertionError that may arise during the DeepLake object creation
-#             print(AssertionError)  # Print the AssertionError
-#     return dl_dict  # Return the dictionary of DeepLake objects
-
-
-# db = retrieve_datasets_deeplake(["test_balancer_docs"])
-# print("db", db)
-
-# llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo"))
-# service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor)
-query = "what is Ali's favorite sport?"
+query = "On Ocean Protocol,  right now im trying to build up my own market-place with an external chain (Gen-X-Testnet). In the current state, i can see all service offerings, which are cached by aquarius. there are some difficulties though with publishing a dataset towards the Gen-X-Testnet from our marketplace. I can verify with Block Explorer, that the transactions worked successfully. But theres an issue with publishing the ddo."
 
 query_vector = [random.random() for _ in range(1536)]
 reader = DeepLakeReader()
 queryvector = [random.random() for _ in range(1536)]
 documents = reader.load_data(
     query_vector=query_vector,
-    dataset_path="hub://tali/test_balancer_docs",
+    dataset_path="hub://tali/ocean_protocol_docs",
     limit=30,
 )
 documents = documents
@@ -83,25 +62,6 @@ documents_content = [result.document['text'] for result in response.results]
 
 print('documents_content', documents_content)
 
-# index = VectorStoreIndex.from_documents(documents, use_async=True)
-# query_engine = index.as_query_engine(similarity_top_k=3)
-
-# response = query_engine.query(query)
-
-# print(response)
-
-##############
-
-
-#### Cohere####
-# response = co.rerank(
-#     model='rerank-english-v2.0',
-#     query=query,
-#     documents=evaluated_docs,
-#     top_n=5,
-# )
-##############
-
 
 # Define Tools
 def ali_color() -> int:
@@ -122,33 +82,15 @@ def ali_food() -> int:
     return "Kabobs"
 
 
-def get_joke():
-    """Useful for getting jokes"""
-    response = requests.get('https://v2.jokeapi.dev/joke/Any')
-    if response.status_code == 200:
-        data = response.json()
-        if 'joke' in data:  # for single part jokes
-            return data['joke']
-        elif 'setup' in data and 'delivery' in data:  # for two-part jokes
-            return f"{data['setup']} - {data['delivery']}"
-        else:
-            return 'No joke found'
-    else:
-        return 'Something went wrong'
-
-
-ali_color = FunctionTool.from_defaults(fn=ali_color)
-ali_sport = FunctionTool.from_defaults(fn=ali_sport)
-ali_food = FunctionTool.from_defaults(fn=ali_food)
-get_joke = FunctionTool.from_defaults(fn=get_joke)
+discord = FunctionTool.from_defaults(fn=search_discord)
+# google = FunctionTool.from_defaults(fn=google_search)
 
 # initialize llm
 llm = OpenAI(model="gpt-3.5-turbo-0613")
 
 # initialize ReAct agent
 agent = ReActAgent.from_tools(
-    [ali_color, ali_sport, ali_food, get_joke], llm=llm, verbose=True)
-
+    [discord], llm=llm, verbose=True)
 
 #### Evaluate if the question is answered by the inital docs search#####
 
@@ -167,12 +109,11 @@ prompt = f"""You are Tali, a developer support bot. Your role is to assist with 
     The user's query is: {query}
     Context sources, which include documentation, are: {documents_content}
 
-    There may be a chat history with previous questions and answers. Use this history if it's relevant to the question."""
+    Remember you can only rely on information given to you based on the context sources."""
 
 MAX_RETRIES = 3
 SLEEP_TIME = 1  # in seconds
 print("prompt bool", prompt)
-
 
 for _ in range(MAX_RETRIES):
     try:
