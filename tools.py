@@ -202,5 +202,4 @@ def cut_string_at_char(input_string, max_tokens=14000):
     else:
         return input_string
 
-ticket_escalation("test@125.com", "n ocean.js when calling the function nft.setMetadataAndTokenURI() you need to set additional tokenId and tokenUri parameters compared to nft.setMetadata(). If I figured out correctly you put 1 as the value for tokenId but wherefrom do you derive the string (required?) for tokenURI?")
 __all__ = ['search_discord', 'google_search', 'ticket_escalation']
