@@ -26,14 +26,12 @@ project_docs_link = os.environ.get("PROJECT_DOCS_LINK")
 activeloop_token = os.environ.get("ACTIVELOOP_TOKEN")
 
 print(openai_api_key)
-# embeddings = OpenAIEmbeddings()
 openai.api_key = openai_api_key
 co = cohere.Client(cohere_api_key)
 app = Flask(__name__)
 url = "https://hooks.zapier.com/hooks/catch/14962368/3mlonub/"
 
 #### DeepLake####
-# This function retrieves the DeepLake datasets
 query_vector = [random.random() for _ in range(1536)]
 reader = DeepLakeReader()
 documents = reader.load_data(
@@ -43,33 +41,11 @@ documents = reader.load_data(
 )
 documents = documents
 
-
-# @app.route('/email_received', methods=['POST'])
 def email_received(query):
     global documents
 
-    # if '' in request.json:
-    #     query = query
-
-    #     query = query.replace('\r\n', ' ').strip()
-    # else:
-    #     print("No email body received in the request.")
-    #     return
-
-    print('query', query)
-    # query_vector = [random.random() for _ in range(1536)]
-    # reader = DeepLakeReader()
-    # documents = reader.load_data(
-    #     query_vector=query_vector,
-    #     dataset_path="hub://tali/ocean_protocol_docs",
-    #     limit=30,
-    # )
-    # documents = documents
-
     # Assuming documents_list is your list of Document objects
     documents = [{"text": doc.text} for doc in documents]
-
-    # print("documents", documents)
 
     response = co.rerank(
         model='rerank-english-v2.0',
@@ -86,22 +62,6 @@ def email_received(query):
     print('documents_content', documents_content)
 
     # Define Tools
-
-    def ali_color() -> int:
-        """Useful to understand what Ali's favorite color is"""
-        print("ali_color hit")
-        return "Terquoise"
-
-    def ali_sport() -> int:
-        """Useful to understand what Ali's favorite sport is"""
-        print("ali_sport hit")
-        return "Cycling"
-
-    def ali_food() -> int:
-        """Useful to understand what Ali's favorite food is"""
-        print("ali_food hit")
-        return "Kabobs"
-
     google = FunctionTool.from_defaults(fn=google_search)
     ticket = FunctionTool.from_defaults(fn=ticket_escalation)
 
@@ -214,11 +174,11 @@ def get_input():
     while True:
         try:
             query = input('Please enter an your support question: ')
-            if not query:  # If the string is empty
+            if not query:  
                 raise ValueError('No input provided')
             else:
                 email_received(query)
-                break  # Exit the loop if the input is valid
+                break  
         except ValueError as e:
             print(e)
 
