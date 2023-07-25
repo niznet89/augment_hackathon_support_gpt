@@ -132,7 +132,7 @@ def email_received(query):
         Remember you can only rely on information given to you based on the context sources."""
 
     MAX_RETRIES = 3
-    SLEEP_TIME = 1  # in seconds
+    SLEEP_TIME = 1 
     print("prompt bool", prompt)
 
     for _ in range(MAX_RETRIES):
@@ -173,7 +173,7 @@ def email_received(query):
         Remember, you can only use the context provided to answer the question. You can only reply with a "Yes" or "No"."""
 
     MAX_RETRIES = 3
-    SLEEP_TIME = 1  # in seconds
+    SLEEP_TIME = 1  
     print("prompt bool", prompt2)
 
     for _ in range(MAX_RETRIES):
@@ -185,7 +185,6 @@ def email_received(query):
                 ],
                 temperature=0
             )
-            # return the cleaned text from the model
             print('completion', completion['choices'][0]['message']['content'])
             evaluationResults = completion['choices'][0]['message']['content']
         except Exception as e:
@@ -200,22 +199,6 @@ def email_received(query):
 
         ticket_solved('alikaghatx@gmail.com', evaluationResults)
 
-        # data = {
-        #     "who": "Ali@trytali.com",  # Replace with the actual data
-        #     "what": {initalAnswer},  # Replace with the actual data
-        # }
-
-        # # Send the POST request
-        # response = requests.post(url, data=data)
-
-        # # Check the response
-        # if response.status_code == 200:
-        #     print('POST was successful')
-        # else:
-        #     print('Failed to send POST')
-
-        # return 'Success', 200
-
     else:
         agent.chat(f"""Use the following tools to answer this question:
 
@@ -225,20 +208,6 @@ def email_received(query):
 
             You'll have 2 iterations to ask questions of the different tools. If you're on the 2nd iteration and you don't have an answer USE the Ticket Escalation tool.""")
         print("Agent Chat History: ", agent.chat_history)
-
-        # data = {
-        #     "who": "Ali@trytali.com",  # Replace with the actual data
-        #     "what": {agent.chat_history},  # Replace with the actual data
-        # }
-
-        # # Send the POST request
-        # response = requests.post(url, data=data)
-
-        # # Check the response
-        # if response.status_code == 200:
-        #     print('POST was successful')
-        # else:
-        #     print('Failed to send POST')
 
 
 def get_input():
@@ -255,8 +224,3 @@ def get_input():
 
 
 get_input()
-#     return 'Success', 200
-
-
-# if __name__ == '__main__':
-#     app.run()
