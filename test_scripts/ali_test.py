@@ -45,16 +45,16 @@ documents = documents
 
 
 # @app.route('/email_received', methods=['POST'])
-def email_received():
+def email_received(query):
     global documents
 
-    if '' in request.json:
-        query = request.json['']
+    # if '' in request.json:
+    #     query = query
 
-        query = query.replace('\r\n', ' ').strip()
-    else:
-        print("No email body received in the request.")
-        return
+    #     query = query.replace('\r\n', ' ').strip()
+    # else:
+    #     print("No email body received in the request.")
+    #     return
 
     print('query', query)
     # query_vector = [random.random() for _ in range(1536)]
@@ -198,6 +198,8 @@ def email_received():
     if evaluationResults == "Yes":
         print("Evaluation Results: ", evaluationResults)
 
+        ticket_solved('alikaghatx@gmail.com', evaluationResults)
+
         # data = {
         #     "who": "Ali@trytali.com",  # Replace with the actual data
         #     "what": {initalAnswer},  # Replace with the actual data
@@ -238,8 +240,23 @@ def email_received():
         # else:
         #     print('Failed to send POST')
 
-    return 'Success', 200
+
+def get_input():
+    while True:
+        try:
+            query = input('Please enter an your support question: ')
+            if not query:  # If the string is empty
+                raise ValueError('No input provided')
+            else:
+                email_received(query)
+                break  # Exit the loop if the input is valid
+        except ValueError as e:
+            print(e)
 
 
-if __name__ == '__main__':
-    app.run()
+get_input()
+#     return 'Success', 200
+
+
+# if __name__ == '__main__':
+#     app.run()
