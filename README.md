@@ -33,12 +33,12 @@ It uses the  along with OpenAI and [Cohere](https://cohere.com/) APIs to build a
 
 The main components are:
 
-orchestrator.py - Orchestrates the overall workflow and tools using a ReAct agent
-tools.py - Contains reusable tools like search functions
-scrape_to_deeplake.py - Ingests docs/data into a DeepLake vector store
-test_scripts/* - Scripts to test individual components
-retrieve_doc_nodes.py - Functions to ingest web pages into documents
-discord_reader.py - Loads Discord data
+- orchestrator.py - Orchestrates the overall workflow and tools using a ReAct agent
+- tools.py - Contains reusable tools like search functions
+- scrape_to_deeplake.py - Ingests docs/data into a DeepLake vector store
+- test_scripts/* - Scripts to test individual components
+- retrieve_doc_nodes.py - Functions to ingest web pages into documents
+- discord_reader.py - Loads Discord data
 
 The .env file contains API keys and configuration.
 
